@@ -312,8 +312,10 @@ async function doInstall(){
   try{var hm2=S.memories.some(function(m){return m.name==='星莱'||m.name==='Lyra';});if(hm2){var em=S.memories.find(function(m){return m.name==='星莱'||m.name==='Lyra';});if(em){S.memorySettings.selectedMemory=em.id;S.memorySettings.is_memory=true;}setStep(4,mt('skip_mem'),'fa-solid fa-circle-check ok');}else{var mid='lyra-char-'+Date.now(),av=fsu||bgUrl||('/ext/'+MY_EXT_ID+'/sticker/happy.png');S.memories.push({id:mid,name:mt('memoryName'),infer:false,providerId:null,model:'',api_key:'',base_url:'',embedding_dims:1024,vendor:'',description:mt('memoryDesc'),avatar:av,personality:mt('memoryPersonality'),mesExample:'',systemPrompt:lyraPrompt(),firstMes:t('greetings',0),alternateGreetings:[t('greetings',1),t('greetings',2),t('greetings',3)],characterBook:[]});S.memorySettings.selectedMemory=mid;S.memorySettings.is_memory=true;setStep(4,mt('step_mem'),'fa-solid fa-circle-check ok');}}catch(e){setStep(4,mt('step_mem')+': '+e.message,'fa-solid fa-triangle-exclamation warn');}
 
   addStep(mt('step_save'),'fa-solid fa-spinner fa-spin');
-  // Delete file arrays — SAP frontend manages these via /update_storage
-  delete S.imageFiles;delete S.textFiles;delete S.videoFiles;
+  // Refresh file arrays from SAP before saving, and sanitize
+  try{var st=await fetch('/update_storage').then(function(r){return r.json();}).catch(function(){return{};});
+    var clean=function(arr){return(Array.isArray(arr)?arr:[]).filter(function(f){return f&&typeof f==='object'&&f.unique_filename;});};
+    S.imageFiles=clean(st.imageFiles);S.textFiles=clean(st.textFiles);S.videoFiles=clean(st.videoFiles);}catch(e){}
   ws.send(JSON.stringify({type:'save_settings',data:S}));await sleep(500);setStep(5,mt('step_save'),'fa-solid fa-circle-check ok');
   _installed=true;_installing=false;showInstallUI();settingsCache=S;setTimeout(function(){showToast(mt('success'),'','ok');},400);
 }
