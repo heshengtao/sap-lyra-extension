@@ -2,6 +2,10 @@
   <img src="backgroud.png" alt="Lyra" width="100%" />
 </p>
 
+<p align="right">
+  <a href="README_zh.md">中文</a> | <b>English</b>
+</p>
+
 <h1 align="center">✨ Lyra 星莱</h1>
 <h3 align="center">Starlight Mage · Astrologer · Digital Astrology Creator</h3>
 

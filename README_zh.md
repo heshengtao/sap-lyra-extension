@@ -2,6 +2,10 @@
   <img src="backgroud.png" alt="星莱" width="100%" />
 </p>
 
+<p align="right">
+  <b>中文</b> | <a href="README.md">English</a>
+</p>
+
 <h1 align="center">✨ 星莱 Lyra</h1>
 <h3 align="center">星空魔法使 · 占星学家 · 数字占星学创始人</h3>
 
