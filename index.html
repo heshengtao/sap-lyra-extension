@@ -111,7 +111,17 @@ footer .dot{width:6px;height:6px;border-radius:50%}
 footer .dot.on{background:rgb(52,211,153);animation:pulse 2s infinite}
 footer .dot.off{background:rgb(239,68,68)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-</style>
+
+/* ─── Toast Notification ─── */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(100px);z-index:1000;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow),0 12px 40px rgba(0,0,0,0.2);padding:16px 24px;display:flex;align-items:center;gap:12px;max-width:420px;opacity:0;transition:all 0.35s cubic-bezier(0.25,0.1,0.25,1)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .toast-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.toast .toast-icon.ok{background:rgba(52,211,153,0.12);color:rgb(52,211,153)}
+.toast .toast-icon.err{background:rgba(239,68,68,0.12);color:rgb(239,68,68)}
+.toast .toast-icon.warn{background:rgba(251,191,36,0.12);color:rgb(251,191,36)}
+.toast .toast-body{font-size:13px;line-height:1.5;color:var(--text)}
+.toast .toast-body .toast-title{font-weight:600;margin-bottom:2px}
+.toast .toast-body .toast-msg{color:var(--text-sub);font-size:12px}</style>
 </head>
 <body>
 
@@ -157,7 +167,16 @@ footer .dot.off{background:rgb(239,68,68)}
           <button class="install-btn" id="installBtn" onclick="onInstallClick()">
             <i class="fa-solid fa-download"></i><span id="installBtnText">一键安装</span>
           </button>
-        </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast">
+  <div class="toast-icon ok" id="toastIcon"><i class="fa-solid fa-circle-check"></i></div>
+  <div class="toast-body">
+    <div class="toast-title" id="toastTitle"></div>
+    <div class="toast-msg" id="toastMsg"></div>
+  </div>
+</div>
         <!-- summary of what will be configured -->
         <div style="font-size:12px;color:var(--text-sub);line-height:1.8" id="installSummary"></div>
         <!-- progress steps -->
@@ -361,7 +380,7 @@ function showInstallUI(){
   if(_installed){
     btn.className='install-btn success';btn.disabled=false;
     btn.innerHTML='<i class="fa-solid fa-circle-check"></i>'+mt('installed');
-    btn.onclick=function(){if(confirm(mt('confirmBody')))doInstall();};
+    btn.onclick=function(){showModal();};
     area.classList.add('done');$('#installSummary').innerHTML=mt('summary_installed');
     badge.className='status-dot ready';bt.textContent=mt('installed');
   }else if(miss.length>0&&miss.length<3){
@@ -390,11 +409,23 @@ function showModal(){
 }
 function hideModal(){$('#modalOverlay').classList.remove('show');}
 
+function showToast(title,msg,type){
+  type=type||'ok';
+  var icon=$('#toastIcon'),ti=$('#toastTitle'),tm=$('#toastMsg'),t=$('#toast');
+  icon.className='toast-icon '+type;
+  icon.innerHTML=type==='ok'?'<i class="fa-solid fa-circle-check"></i>':type==='err'?'<i class="fa-solid fa-circle-xmark"></i>':'<i class="fa-solid fa-triangle-exclamation"></i>';
+  ti.textContent=title||'';
+  tm.textContent=msg||'';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(function(){t.classList.remove('show');},3500);
+}
+
 // Also wire up the install button to use modal instead of direct install
 function onInstallClick(){
   if(_installing||_installed)return;
-  if(!settingsCache){alert(mt('err_settings'));return;}
-  if(!ws||ws.readyState!==WebSocket.OPEN){alert(mt('err_ws'));return;}
+  if(!settingsCache){showToast(mt('err_settings'),'','err');return;}
+  if(!ws||ws.readyState!==WebSocket.OPEN){showToast(mt('err_ws'),'','err');return;}
   showModal();
 }
 var _stepI=0;function addStep(w,c){var el=document.createElement('div');el.className='step';el.innerHTML='<i class="'+c+'"></i><span class="what">'+w+'</span>';$('#stepsBox').appendChild(el);_stepI++;return _stepI-1;}
@@ -402,8 +433,8 @@ function setStep(i,w,c){var els=$('#stepsBox').querySelectorAll('.step');if(els[
 
 async function doInstall(){
   if(_installing||_installed)return;
-  if(!settingsCache){alert(mt('err_settings'));return;}
-  if(!ws||ws.readyState!==WebSocket.OPEN){alert(mt('err_ws'));return;}
+  if(!settingsCache){showToast(mt('err_settings'),'','err');return;}
+  if(!ws||ws.readyState!==WebSocket.OPEN){showToast(mt('err_ws'),'','err');return;}
   _installing=true;showInstallUI();
   $('#stepsBox').innerHTML='';$('#stepsBox').classList.add('show');_stepI=0;
 
@@ -531,7 +562,7 @@ async function doInstall(){
   _installed=true;_installing=false;
   showInstallUI();
   settingsCache=S;
-  setTimeout(function(){alert(mt('success'));},400);
+  setTimeout(function(){showToast(mt('success'),'','ok');},400);
 }
 
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
