@@ -69,7 +69,7 @@ sap-lyra-extension/
 ├── package.json          # Extension metadata & system prompt
 ├── index.html            # Main UI (install flow, story, MCP tools)
 ├── backgroud.png         # Cover / chat background
-├── character_model.zip   # THA ONNX desktop pet model
+├── model.onnx            # THA ONNX desktop pet model (texture baked in)
 ├── en/
 │   └── Lyra.json         # English character card (Chara Card V3)
 ├── zh/

@@ -71,7 +71,7 @@ sap-lyra-extension/
 ├── package.json          # 扩展元数据 & 角色系统提示词
 ├── index.html            # 主界面（安装流程、角色故事、MCP 工具展示）
 ├── backgroud.png         # 封面 / 聊天背景图
-├── character_model.zip   # THA ONNX 桌面宠物模型
+├── model.onnx            # THA ONNX 桌面宠物模型（纹理已内嵌）
 ├── en/
 │   └── Lyra.json         # 英文角色卡（酒馆 Chara Card V3 格式）
 ├── zh/
